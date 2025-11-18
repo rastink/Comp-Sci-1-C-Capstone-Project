@@ -1,10 +1,3 @@
-/*
- * YouTube Planner - Pseudocode Template
- * 
- * This file contains pseudocode comments for implementing a YouTube video planner.
- * Fill in the actual C++ code based on these comments.
- */
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -20,82 +13,6 @@
 using namespace std;
 
 // ============================================================================
-// INCLUDES
-// ============================================================================
-// PSEUDOCODE: Include necessary header files
-// - iostream for input/output
-// - fstream for file operations
-// - string for string operations
-// - iomanip for formatting output
-// - ctime or chrono for date/time operations
-
-// ============================================================================
-// UML DIAGRAM REPRESENTATION (as comments)
-// ============================================================================
-/*
- * TASK STRUCTURE:
- * 
- * Task
- * +----------------------------+
- * | - title: string            |
- * | - description: string      |
- * | - status: string           |
- * | - createdAt: string        |
- * | - updatedAt: string        |
- * | - topics: string[]         |  (PARALLEL ARRAY 1)
- * | - topicCompleted: bool[]   |  (PARALLEL ARRAY 2)
- * | - topicCount: int          |
- * +----------------------------+
- * | + calculatePercentComplete()|
- * | + displayTaskDetails()     |
- * +----------------------------+
- * 
- * PLANNER CLASS:
- * 
- * Planner
- * +----------------------------+
- * | - tasks: Task[]            |
- * | - taskCount: int           |
- * | - filename: string         |
- * +----------------------------+
- * | + displayMainMenu()        |
- * | + viewTasks()              |
- * | + editTasks()              |
- * | + createTask()             |
- * | + saveToFile()             |
- * | + loadFromFile()           |
- * | + quit()                   |
- * +----------------------------+
- * 
- * RELATIONSHIP: Planner contains array of Task objects (composition)
- */
-
-// ============================================================================
-// VARIABLES - Data Structure Definition
-// ============================================================================
-/*
- * VARIABLES NEEDED:
- * 
- * Task Structure:
- * - title: string (video title)
- * - description: string (video description)
- * - status: string ("In Progress", "Completed", "Canceled")
- * - createdAt: string (creation date/time)
- * - updatedAt: string (last update date/time)
- * - topics: string[] (PARALLEL ARRAY - list of topic names)
- * - topicCompleted: bool[] (PARALLEL ARRAY - completion status for each topic)
- * - topicCount: int (number of topics)
- * 
- * Planner Variables:
- * - tasks: Task[] (array of all tasks)
- * - taskCount: int (number of tasks)
- * - filename: string (name of save file)
- * 
- * Menu Variables:
- * - choice: int (user menu selection)
- * - taskIndex: int (selected task index)
- */
-// ============================================================================
 // CONSTANTS
 // ============================================================================
 const int MAX_TASKS = 100;
@@ -105,8 +22,6 @@ const string FILENAME = "youtube_tasks.txt";
 // ============================================================================
 // STRUCTURE DEFINITION
 // ============================================================================
-// PSEUDOCODE: Define Task structure
-// STRUCT Task:
 class Task {
     public:
         string title;
