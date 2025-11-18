@@ -12,8 +12,9 @@ Make a selection by pressing one of the five options: `[1, 2, 3, 4, 5]`
 1. View Tasks
 2. Edit Tasks
 3. Create Task
-4. Save
-5. Quit
+4. Delete
+5. Save
+6. Quit
 ```
 
 ## View Tasks Menu
