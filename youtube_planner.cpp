@@ -3,10 +3,6 @@
 #include <string>
 #include <iomanip>
 #include <ctime>
-#include <chrono>
-#include <vector>
-#include <algorithm>
-#include <random>
 #include <sstream>
 #include <istream>
 
@@ -54,8 +50,14 @@ int calculatePercentComplete(Task task);
 string getCurrentDateTime();
 void validateStatus(string status);
 void displayMainMenu();
+void displayTopicMenu(int taskIndex);
+void listTopics(int taskIndex, string action);
+void toggleTopicStatus(int taskIndex);
+void addNewTopic(int taskIndex);
+void deleteTopic(int taskIndex);
 
 void displayMainMenu() {
+    cout << "____________________________________________________________" << endl;
     cout << "1. View Tasks" << endl;
     cout << "2. Edit Tasks" << endl;
     cout << "3. Create Task" << endl;
@@ -64,7 +66,6 @@ void displayMainMenu() {
     cout << "6. Quit" << endl;
     cout << "Enter choice: ";
 }
-
 
 // ============================================================================
 // MAIN FUNCTION
@@ -79,7 +80,8 @@ int main() {
         if (choice == 1) {
             // cout << "viewTasks()" << endl;
             int taskIndex = listTasks("view");
-            if (taskIndex != 0) {
+            cout << "taskIndex: " << taskIndex << endl;
+            if (taskIndex + 1 != 0) {
                 displayTaskDetails(taskIndex);
             }
         } else if (choice == 2) {
@@ -112,7 +114,6 @@ int main() {
     return 0;
 }
 
-
 // ============================================================================
 // VIEW TASKS
 // ============================================================================
@@ -130,7 +131,7 @@ int listTasks(string action) {
     int taskSelection;
     cin >> taskSelection;
     if (taskSelection == 0) {
-        return 0;
+        return -1;
     } else if (taskSelection < 1 || taskSelection > taskCount) {
         cout << "Invalid task number." << endl;
         return 0;
@@ -182,24 +183,27 @@ void editTask(int taskIndex) {
         tasks[taskIndex].description = newDescription;
         tasks[taskIndex].updatedAt = getCurrentDateTime();
     }
-    // TODO: Add code to edit completed and incomplete topics
+    displayTopicMenu(taskIndex);
     cout << "Status: " << tasks[taskIndex].status << endl;
     cout << "Press ENTER to skip, or enter new status (In Progress/Completed/Canceled): ";
     string newStatus;
-    getline(cin, newStatus);
-    if (!newStatus.empty()) {
-        if (newStatus == "In Progress" || newStatus == "Completed" || newStatus == "Canceled") {
-            tasks[taskIndex].status = newStatus;
-            tasks[taskIndex].updatedAt = getCurrentDateTime();
+    getline(cin.ignore(), newStatus);
+    while (newStatus.empty() || newStatus != "In Progress" || newStatus != "Completed" || newStatus != "Canceled") {
+        if (newStatus.empty()) {
+            cout << "Status is required. Please enter a status: ";
+            getline(cin, newStatus);
         }
-        else {
+        else if (newStatus != "In Progress" && newStatus != "Completed" && newStatus != "Canceled") {
             cout << "Invalid status. Must be: In Progress, Completed, or Canceled" << endl;
             cout << "Please enter a valid status: ";
             getline(cin, newStatus);
-            tasks[taskIndex].status = newStatus;
-            tasks[taskIndex].updatedAt = getCurrentDateTime();
+        }
+        else {
+            break;
         }
     }
+    tasks[taskIndex].status = newStatus;
+    tasks[taskIndex].updatedAt = getCurrentDateTime();
     cout << "Task updated successfully." << endl;
 }   
 
@@ -378,6 +382,7 @@ void quit() {
         cout << "Invalid choice. Quitting without saving." << endl;
     }
 }
+
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
@@ -396,4 +401,115 @@ string getCurrentDateTime() {
        << setfill('0') << setw(2) << localTime->tm_min;
     
     return ss.str();
+}
+void listTopics(int taskIndex, string action) {
+    cout << "Topics:" << endl;
+    for (int i = 0; i < tasks[taskIndex].topicCount; i++) {
+        if (tasks[taskIndex].topicCompleted[i] == true) {
+            if (action == "list") {
+                cout << "- " << tasks[taskIndex].topics[i] << ": y" << endl;
+            }
+            else {
+                cout << i + 1 << ": " << tasks[taskIndex].topics[i] << ": y" << endl;
+            }
+        }
+        else {
+            if (action == "list") {
+                cout << "- " << tasks[taskIndex].topics[i] << ": n" << endl;
+            }
+            else {
+                cout << i + 1 << ": " << tasks[taskIndex].topics[i] << ": n" << endl;
+            }
+        }
+    }
+    if (action == "delete") {
+        cout << "0. Cancel Delete Topic" << endl;
+    }
+    else if (action == "toggle") {
+        cout << "0. Cancel Toggle Topic Status" << endl;
+    }
+}
+void displayTopicMenu(int taskIndex) {
+    listTopics(taskIndex, "list");
+    cout << "1. Toggle status of topic" << endl;
+    cout << "2. Add new topic" << endl;
+    cout << "3. Delete topic" << endl;
+    cout << "0. Continue" << endl;
+    cout << "Enter choice: ";
+    int choice;
+    cin >> choice;
+    if (choice == 0) {
+        return;
+    }
+    else if (choice == 1) {
+        toggleTopicStatus(taskIndex);
+    }
+    else if (choice == 2) {
+        addNewTopic(taskIndex);
+    }
+    else if (choice == 3) {
+        deleteTopic(taskIndex);
+    }
+}
+void toggleTopicStatus(int taskIndex) {
+    listTopics(taskIndex, "toggle");
+    cout << "Enter topic number to toggle status: ";
+    int topicIndex;
+    while (1==1) {
+        cin >> topicIndex;
+        if (topicIndex > 0 && topicIndex <= tasks[taskIndex].topicCount) {
+            tasks[taskIndex].topicCompleted[topicIndex - 1] = !tasks[taskIndex].topicCompleted[topicIndex - 1];
+            tasks[taskIndex].updatedAt = getCurrentDateTime();
+            break;
+        } else if (topicIndex == 0) {
+            return;
+        }
+        else {
+            cout << "Invalid topic number. Please enter a valid topic number: ";
+        }
+    }
+    displayTopicMenu(taskIndex);
+}
+void addNewTopic(int taskIndex) {
+    cout << "Enter new topic: ";
+    string newTopic;
+    getline(cin.ignore(), newTopic);
+    while (newTopic.empty()) {
+        cout << "Topic is required. Please enter a topic: ";
+        getline(cin.ignore(), newTopic);
+    }
+    tasks[taskIndex].topics[tasks[taskIndex].topicCount] = newTopic;
+    tasks[taskIndex].topicCompleted[tasks[taskIndex].topicCount] = false;
+    tasks[taskIndex].topicCount++;
+    displayTopicMenu(taskIndex);
+}
+void deleteTopic(int taskIndex) {
+    listTopics(taskIndex, "delete");
+    cout << "Enter topic number to delete: ";
+    int topicIndex;
+    while (1==1) {
+        cin >> topicIndex;
+        if (topicIndex > 0 && topicIndex <= tasks[taskIndex].topicCount) {
+            break;
+        }
+        else if (topicIndex == 0) {
+            return;
+        }
+        else {
+            cout << "Invalid topic number. Please enter a valid topic number: ";
+        }
+    }
+    topicIndex--;
+    for (int i = topicIndex; i < tasks[taskIndex].topicCount - 1; i++) {
+        tasks[taskIndex].topics[i] = tasks[taskIndex].topics[i + 1];
+        tasks[taskIndex].topicCompleted[i] = tasks[taskIndex].topicCompleted[i + 1];
+    }
+    tasks[taskIndex].topicCount--;
+    tasks[taskIndex].updatedAt = getCurrentDateTime();
+    if (tasks[taskIndex].topicCount == 0) {
+        cout << "No topics found. Please add at least one topic." << endl;
+        addNewTopic(taskIndex);
+        return;
+    }
+    displayTopicMenu(taskIndex);
 }
